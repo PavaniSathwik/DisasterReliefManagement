@@ -46,7 +46,7 @@ function ResponsiveAppBar() {
             <Link to="/emergency-contacts" style={{ textDecoration: "none", color: "black", fontWeight: "500" }}>
               Emergency Contacts
             </Link>
-            <Link to="/announcements" style={{ textDecoration: "none", color: "black", fontWeight: "500" }}>
+            <Link to="/announcementshome" style={{ textDecoration: "none", color: "black", fontWeight: "500" }}>
               Announcements
             </Link>
             <Link to="/admin-login" style={{ textDecoration: "none", color: "black", fontWeight: "500" }}>

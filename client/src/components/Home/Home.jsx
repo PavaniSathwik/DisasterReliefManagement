@@ -10,12 +10,12 @@ const cardStyle = {
   boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
   padding: "20px",
   transition: "transform 0.3s ease-in-out",
-  marginBottom: "20px", // Added margin for better spacing
+  marginBottom: "20px",
 };
 
 const imageStyle = {
   width: "100%",
-  height: "300px", // Increased height for larger images
+  height: "300px",
   objectFit: "cover",
   borderRadius: "10px",
   marginBottom: "20px",
@@ -32,43 +32,43 @@ const buttonStyle = {
 
 const reliefManagementData = [
   {
-    title: "Disaster Relief Management System",
+    title: "AI-Powered Disaster Response & Relief Coordination",
     description:
-      "An integrated system designed to efficiently manage and allocate resources during disasters, ensuring timely and effective aid distribution. It prioritizes relief based on the severity of emergencies and tracks supplies in real-time.",
-    image: "https://tse1.mm.bing.net/th?id=OIP.ZfBplFUkjS3-ixU14KA9awHaEK&pid=Api",
+      "Leveraging cutting-edge AI algorithms, this system ensures real-time decision-making for optimized resource distribution during natural disasters. It assesses risk zones, prioritizes affected regions, and provides live analytics to responders for immediate action.",
+    image: "/AI disaster response system.png",
     department: "Sheba Technologies Ltd.",
-    helpline: "101",
+    helpline: "101 - National Emergency Response",
   },
   {
-    title: "Virtual Reality-Based Post-Flood Relief Management",
+    title: "Intelligent Disaster Coordination with Machine Learning",
     description:
-      "A system utilizing virtual reality to streamline post-flood relief efforts. It allows victims to select needed supplies through holographic images projected from helicopters, ensuring targeted aid delivery.",
-    image: "https://tse4.mm.bing.net/th?id=OIP.xUzeLOWzrdDkX8LKMA2a-QHaF5&pid=Api",
-    department: "JETIR Research",
-    helpline: "102",
+      "An adaptive disaster management tool using artificial intelligence to predict impact zones, coordinate between emergency units, and dynamically allocate resources based on urgency and availability.",
+    image: "/artificial intelligence disaster coordination.webp",
+    department: "JETIR Research & Development",
+    helpline: "102 - AI Emergency Command",
   },
   {
-    title: "Community-Based Disaster Relief Management System",
+    title: "Emergency Resource Management using Predictive AI",
     description:
-      "A community-driven approach to disaster relief, focusing on local participation and resource management. It emphasizes the importance of community involvement in disaster preparedness and response.",
-    image: "https://tse2.mm.bing.net/th?id=OIP.86ZHK--FKomSi8vpZiz5VgHaET&pid=Api",
-    department: "Community Outreach Programs",
-    helpline: "1078",
+      "This system provides predictive models for pre-disaster planning and emergency logistics. It supports smart inventory control, predictive supply chain routing, and automated alert systems for communities.",
+    image: "/emergency resource management AI.avif",
+    department: "Community Emergency Services",
+    helpline: "1078 - Resource Response Line",
   },
   {
-    title: "Flood Relief Management System",
+    title: "Smart Disaster Management Dashboard",
     description:
-      "A specialized system developed to address the challenges posed by floods. It focuses on efficient resource allocation and real-time tracking to ensure effective relief operations during flood disasters.",
-    image: "https://tse2.mm.bing.net/th?id=OIP.Tfc3dIh8LvFkjttjUTTOQQHaDt&pid=Api",
-    department: "Flood Relief Coordination Center",
-    helpline: "1098",
+      "A centralized control interface displaying real-time data feeds from sensors, drones, and satellites. It enables emergency officials to monitor conditions, track assets, and coordinate responses efficiently.",
+    image: "/smart disaster management dashboard.png",
+    department: "National Flood Relief Coordination Center",
+    helpline: "1098 - Central Flood Command",
   },
 ];
 
 const ReliefManagementSection = () => {
   return (
     <div className="container py-5">
-      <h2 className="text-center fw-semibold mb-4">Relief Management Systems</h2>
+      <h2 className="text-center fw-semibold mb-4">Technology Based Relief Management Systems</h2>
       <div className="row">
         {reliefManagementData.map((item, index) => (
           <motion.div
@@ -114,7 +114,7 @@ const HomePage = () => {
       {/* Hero Section */}
       <div className="position-relative w-100" style={{ height: "450px" }}>
         <img
-          src="/disaster_scene.jpg"  // Keep this image intact as requested
+          src="/disaster_scene.jpg"
           alt="Disaster Management"
           className="w-100 h-100 object-fit-cover"
           style={{ opacity: 0.8 }}
