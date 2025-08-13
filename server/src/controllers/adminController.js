@@ -3,9 +3,8 @@ const Department = require("../models/Department");
 const Employee = require("../models/Employee");
 const User = require('../models/User');
 const EmergencyRequest = require('../models/EmergencyRequest'); // Adjust the path to where your model is located
+const Alert = require("../models/Alert");
 const EmergencyStatus = require("../models/EmergencyStatus");
-
-
 // Get all departments
 exports.getAllDepartments = async (req, res) => {
     try {
@@ -207,7 +206,8 @@ exports.getAllEmergencyRequests = async (req, res) => {
             selectedDepartment: 1,
             location: 1,
             severity: 1,
-            requestId: 1
+            requestId: 1,
+             photos: 1
         });
 
         // Sending the data as JSON response
@@ -257,3 +257,38 @@ exports.updateEmergencyStatus = async (req, res) => {
       }
   };
   
+exports.getAllEmergencyStatuses = async (req, res) => {
+  try {
+    const statuses = await EmergencyStatus.find({});
+    res.status(200).json(statuses);
+  } catch (error) {
+    console.error("Error fetching emergency statuses:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+
+exports.submitAlert = async (req, res) => {
+  try {
+    const { title, situation, helpType, distance, severity } = req.body;
+
+    if (!title || !situation || !helpType || !distance || !severity) {
+      return res.status(400).json({ message: "All fields are required." });
+    }
+
+    const newAlert = new Alert({
+      title,
+      situation,
+      helpType,
+      distance,
+      severity
+    });
+
+    await newAlert.save();
+
+    res.status(201).json({ message: "Alert submitted successfully." });
+  } catch (error) {
+    console.error("Error submitting alert:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};

@@ -3,6 +3,7 @@ import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { FaExclamationTriangle, FaSave, FaTrashAlt } from 'react-icons/fa';
 import { BiLoaderAlt } from 'react-icons/bi';
+import { Carousel } from 'react-bootstrap';
 
 const AdminDisclaimer = () => {
   const [reports, setReports] = useState([]);
@@ -23,6 +24,7 @@ const AdminDisclaimer = () => {
       try {
         const response = await axios.get("http://localhost:3002/api/admin/emergencyrequests");
         setReports(response.data);
+        console.log("📸 Fetched reports with photos:", response.data);
       } catch (err) {
         setError("Failed to load emergency requests");
         console.error("❌ Error fetching reports:", err);
@@ -59,15 +61,14 @@ const AdminDisclaimer = () => {
   const deleteReport = async (index) => {
     const report = reports[index];
     try {
-        await axios.delete(`http://localhost:3002/api/admin/delete-emergency/${report.requestId}`);
-        setReports(reports.filter((_, i) => i !== index));
-        alert("🗑️ Report deleted successfully!");
+      await axios.delete(`http://localhost:3002/api/admin/delete-emergency/${report._id}`);
+      setReports(reports.filter((_, i) => i !== index));
+      alert("🗑️ Report deleted successfully!");
     } catch (error) {
-        console.error("❌ Error deleting report:", error);
-        alert("⚠️ Failed to delete report!");
+      console.error("❌ Error deleting report:", error);
+      alert("⚠️ Failed to delete report!");
     }
-};
-
+  };
 
   if (loading) {
     return (
@@ -91,97 +92,110 @@ const AdminDisclaimer = () => {
         <FaExclamationTriangle className="me-2" /> Emergency Reports Dashboard
       </h2>
 
-      <div className="table-responsive">
-        <table className="table table-bordered table-striped shadow-sm">
-          <thead className="bg-danger text-white">
-            <tr>
-              <th>Username</th>
-              <th>Locality</th>
-              <th>Time</th>
-              <th>Affected</th>
-              <th>Requested</th>
-              <th>Request ID</th>
-              <th>Assigned Dept</th>
-              <th>Status</th>
-              <th>Arrival</th>
-              <th>Precautions</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {reports.length === 0 ? (
-              <tr>
-                <td colSpan="11" className="text-center py-4 text-muted">
-                  <FaExclamationTriangle className="text-warning me-2" /> No emergency reports at the moment.
-                </td>
-              </tr>
-            ) : (
-              reports.map((report, index) => (
-                <tr key={index}>
-                  <td>{report.username}</td>
-                  <td>{report.locality}</td>
-                  <td>{new Date(report.time).toLocaleString()}</td>
-                  <td>{report.peopleAffected}</td>
-                  <td>{report.selectedDepartment}</td>
-                  <td>{report.requestId}</td>
-                  <td>
+      {reports.length === 0 ? (
+        <div className="alert alert-warning text-center">
+          <FaExclamationTriangle className="me-2" /> No emergency reports at the moment.
+        </div>
+      ) : (
+        <div className="row g-4">
+          {reports.map((report, index) => (
+            <div className="col-md-6 col-lg-4" key={index}>
+              <div className="card shadow-lg border-danger h-100">
+                <div className="card-header bg-danger text-white text-center">
+                  🚨 <strong>Request ID:</strong> {report.requestId} 🚨
+                </div>
+
+            {report.photos && report.photos.length > 0 && (
+  <div className="text-center mb-3">
+    <strong>📸 Uploaded Photos:</strong>
+    <div style={{ display: "flex", gap: "10px", flexWrap: "wrap", justifyContent: "center", marginTop: "10px" }}>
+      {report.photos && report.photos.length > 0 && (
+  <Carousel interval={null} variant="dark" className="mb-3">
+    {report.photos.map((photo, idx) => (
+      <Carousel.Item key={idx}>
+        <img
+          className="d-block w-100"
+          src={photo}
+          alt={`Photo ${idx + 1}`}
+          style={{ maxHeight: "300px", objectFit: "cover" }}
+        />
+      </Carousel.Item>
+    ))}
+  </Carousel>
+)}
+    </div>
+  </div>
+)}
+
+
+                <div className="card-body">
+                  <h5 className="card-title">{report.username} - {report.locality}</h5>
+                  <p className="card-text">
+                    <strong>🕒 Time:</strong> {new Date(report.time).toLocaleString()}<br />
+                    <strong>👥 People Affected:</strong> {report.peopleAffected}<br />
+                    <strong>📡 Initial Dept:</strong> {report.selectedDepartment}
+                  </p>
+
+                  <div className="mb-2">
+                    <label className="form-label">Assign Department</label>
                     <select
-                      className="form-select form-select-sm"
+                      className="form-select"
                       value={report.selectedDepartment || "Fire"}
                       onChange={(e) => handleChange(index, "selectedDepartment", e.target.value)}
                     >
-                      {availableDepartments.map((department, i) => (
-                        <option key={i} value={department}>
-                          {department}
-                        </option>
+                      {availableDepartments.map((dept, i) => (
+                        <option key={i} value={dept}>{dept}</option>
                       ))}
                     </select>
-                  </td>
-                  <td>
+                  </div>
+
+                  <div className="mb-2">
+                    <label className="form-label">Status</label>
                     <select
-                      className="form-select form-select-sm"
-                      value={report.status || "Pending"}
+                      className="form-select"
+                      value={report.status || "Pending ⏳"}
                       onChange={(e) => handleChange(index, "status", e.target.value)}
                     >
                       {statusOptions.map((status, i) => (
-                        <option key={i} value={status}>
-                          {status}
-                        </option>
+                        <option key={i} value={status}>{status}</option>
                       ))}
                     </select>
-                  </td>
-                  <td>
+                  </div>
+
+                  <div className="mb-2">
+                    <label className="form-label">Arrival Time</label>
                     <input
                       type="datetime-local"
-                      className="form-control form-control-sm"
+                      className="form-control"
                       value={report.arrivalTime || ""}
                       onChange={(e) => handleChange(index, "arrivalTime", e.target.value)}
                     />
-                  </td>
-                  <td>
+                  </div>
+
+                  <div className="mb-2">
+                    <label className="form-label">Precautions</label>
                     <textarea
-                      className="form-control form-control-sm"
-                      placeholder="Precautions"
+                      className="form-control"
+                      placeholder="Enter precautions..."
                       value={report.precautions || ""}
                       onChange={(e) => handleChange(index, "precautions", e.target.value)}
                     />
-                  </td>
-                  <td className="text-center">
-                    <div className="d-flex gap-2 justify-content-center">
-                      <button className="btn btn-sm btn-outline-success" onClick={() => saveReport(index)}>
-                        <FaSave className="me-1" /> Save
-                      </button>
-                      <button className="btn btn-sm btn-outline-danger" onClick={() => deleteReport(index)}>
-                        <FaTrashAlt className="me-1" /> Delete
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+                  </div>
+                </div>
+
+                <div className="card-footer d-flex justify-content-between">
+                  <button className="btn btn-sm btn-success w-50 me-2" onClick={() => saveReport(index)}>
+                    <FaSave className="me-1" /> Save
+                  </button>
+                  <button className="btn btn-sm btn-outline-danger w-50" onClick={() => deleteReport(index)}>
+                    <FaTrashAlt className="me-1" /> Delete
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

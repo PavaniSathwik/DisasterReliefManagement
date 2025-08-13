@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { FaBuilding, FaCheckCircle, FaClock, FaExclamationTriangle, FaNewspaper } from 'react-icons/fa';
+import { motion } from "framer-motion"; // ✅ animation for motivational alert
 
 const cardStyle = {
     boxShadow: '0 4px 8px 0 rgba(0,0,0,0.15)',
@@ -61,7 +62,7 @@ const AdminReplyCard = ({ incident }) => {
     const [isHovering, setIsHovering] = React.useState(false);
     const getStatusColor = (status) => {
         if (status && status.toLowerCase().includes('resolved')) return 'text-success';
-        if (status && status.toLowerCase().includes('assigned')) return 'text-info'; // Adjusted for "Team Assigned"
+        if (status && status.toLowerCase().includes('assigned')) return 'text-info';
         return 'text-warning';
     };
 
@@ -136,6 +137,9 @@ const AdminReplyPage = () => {
                     <FaNewspaper className="me-2" /> Incident Updates
                 </h2>
             </div>
+
+           
+
             <div className="d-flex flex-wrap">
                 {incidentsData.map((incident) => (
                     <AdminReplyCard
@@ -150,6 +154,22 @@ const AdminReplyPage = () => {
                     />
                 ))}
             </div>
+             {/* 💡 Motivational Alert Section */}
+            <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8 }}
+                className="alert alert-warning text-center fw-bold fs-5 py-3 px-4 mb-4"
+                style={{
+                    backgroundColor: "#fff3cd",
+                    border: "1px solid #ffeeba",
+                    borderRadius: "10px",
+                    color: "#856404",
+                }}
+            >
+                🙌 <strong>Your support can be the reason someone survives today.</strong> <br />
+                Be the helping hand in someone’s darkest hour. Thank you for stepping up — your contribution saves lives!
+            </motion.div>
         </div>
     );
 };

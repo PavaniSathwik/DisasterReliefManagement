@@ -9,18 +9,24 @@ export default function Login() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const handleLogin = async () => {
-    try {
-      const response = await axios.post("http://localhost:3002/api/users/login", { email, password });
+const handleLogin = async () => {
+  try {
+    const response = await axios.post("http://localhost:3002/api/users/login", { email, password });
 
-      localStorage.setItem("token", response.data.token);
-      localStorage.setItem("username", response.data.username);
+    localStorage.setItem("token", response.data.token);
+    localStorage.setItem("username", response.data.username);
 
-      navigate("/user/home");  // ✅ Redirect to User Home
-    } catch (err) {
-      setError(err.response?.data?.message || "Login failed");
-    }
-  };
+    // Save volunteer email for later fetching volunteer data
+    localStorage.setItem("volunteerEmail", response.data.email); // 👈 store email
+
+
+    navigate("/user/home");  // ✅ Redirect to User Home
+  } catch (err) {
+    setError(err.response?.data?.message || "Login failed");
+  }
+};
+
+
 
   return (
     <Container maxWidth="xs">

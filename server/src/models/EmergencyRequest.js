@@ -1,7 +1,5 @@
-// models/EmergencyRequest.js
 const mongoose = require('mongoose');
 
-// Define the EmergencyRequest schema
 const emergencyRequestSchema = new mongoose.Schema({
   username: { type: String, required: true },
   locality: { type: String, required: true },
@@ -11,7 +9,7 @@ const emergencyRequestSchema = new mongoose.Schema({
   location: { type: String, required: true },
   severity: { type: String, required: true, enum: ['Critical', 'Severe', 'Moderate', 'Low'] },
   requestId: { type: String, required: true, unique: true },
+  photos: [String] // ✅ Now supports multiple photos
 }, { timestamps: true });
 
-// Create and export the model
 module.exports = mongoose.model('EmergencyRequest', emergencyRequestSchema);

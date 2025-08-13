@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import "leaflet/dist/leaflet.css";
+
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import ResponsiveAppBar from "./components/Navbar/Navbar";
 import Footer from "./components/Footer/Footer";

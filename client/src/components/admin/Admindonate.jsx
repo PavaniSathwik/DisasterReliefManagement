@@ -31,9 +31,9 @@ const AdminDonate = () => {
       amount: "$200",
       items: ["Rice", "Canned Beans", "Bottled Water"],
       status: "Pending",
-      packagedPhoto: "package2.jpg",
-      repPhoto: "rep2.jpg",
-      donorWithRepPhoto: "donor_rep2.jpg",
+      packagedPhoto: "/volunteer1.jpg",
+      repPhoto: "/volunteer1.jpg",
+      donorWithRepPhoto: "/volunteer1.jpg",
     },
   ]);
 
@@ -107,17 +107,19 @@ const AdminDonate = () => {
                     </tr>
                   </tbody>
                 </Table>
-                <div className="text-center mb-3">
-                  <img src={donor.packagedPhoto} alt="Package" className="img-fluid rounded" style={{ maxHeight: "150px" }} />
-                  <p className="text-muted mt-2">📦 Package Prepared for Donation</p>
-                </div>
-                <div className="text-center mb-3">
-                  <img src={donor.repPhoto} alt="Representative" className="img-fluid rounded" style={{ maxHeight: "150px" }} />
-                  <p className="text-muted mt-2">🏢 Organization Representative</p>
-                </div>
-                <div className="text-center mb-3">
-                  <img src={donor.donorWithRepPhoto} alt="Donor with Representative" className="img-fluid rounded" style={{ maxHeight: "150px" }} />
-                  <p className="text-muted mt-2">🤝 Donor with Representative</p>
+                <div className="row text-center mb-3">
+                  <div className="col-12 col-md-4 mb-2">
+                    <img src={donor.packagedPhoto} alt="Package" className="img-fluid rounded" style={{ maxHeight: "120px" }} />
+                    <p className="text-muted mt-1">📦 Package Ready</p>
+                  </div>
+                  <div className="col-12 col-md-4 mb-2">
+                    <img src={donor.repPhoto} alt="Recipient" className="img-fluid rounded" style={{ maxHeight: "120px" }} />
+                    <p className="text-muted mt-1">👤 Recipient</p>
+                  </div>
+                  <div className="col-12 col-md-4 mb-2">
+                    <img src={donor.donorWithRepPhoto} alt="Donor" className="img-fluid rounded" style={{ maxHeight: "120px" }} />
+                    <p className="text-muted mt-1">🙋 Donor</p>
+                  </div>
                 </div>
                 {donor.status === "Pending" && (
                   <div className="text-center">

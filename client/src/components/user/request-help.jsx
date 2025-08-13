@@ -2,16 +2,23 @@ import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 
 const RequestHelp = () => {
-  const [formData, setFormData] = useState({
-    username: "",
-    locality: "",
-    time: "",
-    peopleAffected: "",
-    selectedDepartment: "",
-    location: "",
-    severity: "Moderate",
-    requestId: "",
-  });
+ const [formData, setFormData] = useState({
+  username: "",
+  locality: "",
+  time: "",
+  peopleAffected: "",
+  selectedDepartment: "",
+  location: "",
+  severity: "Moderate",
+  requestId: "",
+  photos: [] // ✅ array// 👈 Use single photo string (not an array)
+});
+
+
+  
+
+
+
 
   const localityRef = useRef(null);
 
@@ -27,6 +34,7 @@ const RequestHelp = () => {
       requestId: "REQ-" + Math.floor(Math.random() * 1000000),
     }));
   };
+
 
   const getCurrentLocation = () => {
     if (navigator.geolocation) {
@@ -47,18 +55,43 @@ const RequestHelp = () => {
     }
   };
 
-  const fetchLocality = async (lat, lon) => {
-    try {
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`
-      );
-      const data = await response.json();
-      const locality = data.address?.city || data.address?.town || "Unknown locality";
-      setFormData((prevData) => ({ ...prevData, locality }));
-    } catch (error) {
-      console.error("Error fetching locality:", error);
-    }
-  };
+const fetchLocality = async (lat, lon) => {
+  try {
+    const response = await fetch(
+      `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&addressdetails=1`
+    );
+    const data = await response.json();
+
+    const addr = data.address || {};
+
+    // Try all fields in order of best to least preferred
+    const locality =
+      addr.suburb ||
+      addr.neighbourhood ||
+      addr.village ||
+      addr.town ||
+      addr.city ||
+      addr.county ||
+      addr.state_district ||
+      addr.state ||
+      "Unknown locality";
+
+    // Optionally combine for more detail: "Miyapur, Hyderabad"
+    const combined = [addr.suburb, addr.city || addr.state].filter(Boolean).join(", ");
+
+    setFormData((prevData) => ({
+      ...prevData,
+      locality: combined || locality,
+    }));
+  } catch (error) {
+    console.error("Error fetching locality:", error);
+    setFormData((prevData) => ({
+      ...prevData,
+      locality: "Unknown locality",
+    }));
+  }
+};
+
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -66,7 +99,10 @@ const RequestHelp = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log("Form data being submitted:", formData); 
     try {
+
+    
       const response = await axios.post("http://localhost:3002/api/users/submit-emergency", formData);
       if (response.status === 201) {
         alert("Emergency request submitted successfully!");
@@ -80,7 +116,29 @@ const RequestHelp = () => {
       );
     }
   };
+//-----------------------------------------------------------
+const handlePhotoUpload = (e) => {
+  const files = Array.from(e.target.files);
+  const photosArr = [];
 
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      photosArr.push(reader.result);
+
+      // When all files processed, update state once
+      if (photosArr.length === files.length) {
+        setFormData(prev => ({ ...prev, photos: photosArr }));
+      }
+    };
+    reader.readAsDataURL(file);
+  });
+};
+
+
+
+
+  //----------------------------------------------------------------
   return (
     <div className="container mt-4 d-flex flex-column align-items-center">
       <div className="alert alert-danger text-center p-3 rounded shadow-lg w-100">
@@ -108,6 +166,24 @@ const RequestHelp = () => {
         <p className="text-center text-muted mb-3 small">Your unique tracking ID: <span className="fw-bold">{formData.requestId}</span></p>
 
         <form onSubmit={handleSubmit} className="d-flex flex-column">
+          
+                        <div className="mb-2">
+
+ <input
+  type="file"
+  accept="image/*"
+  multiple  // << add this
+  onChange={handlePhotoUpload}
+/>
+
+
+
+</div>
+
+
+
+
+
           {[
             { label: "🧑‍💻 Your Name", name: "username", type: "text", required: true },
             { label: "📍 Current Locality", name: "locality", type: "text", readOnly: true, ref: localityRef },
