@@ -16,28 +16,41 @@ const UserHome = () => {
   const [volunteer, setVolunteer] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  
+
+
+
+useEffect(() => {
+  // ✅ Always fetch email from localStorage
   const volunteerEmail = localStorage.getItem("volunteerEmail");
+  console.log("📩 Fetching volunteer for email:", volunteerEmail);
 
-  useEffect(() => {
-    const fetchVolunteerStatus = async () => {
-      try {
-        const res = await axios.get("http://localhost:3002/api/users/volunteer-details", {
-          params: { email: volunteerEmail },
-        });
-        setVolunteer(res.data);
-      } catch (err) {
-        console.error("❌ Failed to fetch volunteer status", err);
-      } finally {
-        setLoading(false);
-      }
-    };
+  if (!volunteerEmail) {
+    console.warn("⚠️ Volunteer email missing in localStorage");
+    setLoading(false);
+    return;
+  }
 
-    if (volunteerEmail) {
-      fetchVolunteerStatus();
-    } else {
+  const fetchVolunteerStatus = async () => {
+    try {
+      const res = await axios.get(
+        "http://localhost:3002/api/users/volunteer-details",
+        { params: { email: volunteerEmail } } // send email dynamically
+      );
+
+      console.log("✅ Volunteer data received:", res.data);
+      setVolunteer(res.data);
+    } catch (err) {
+      console.error("❌ Failed to fetch volunteer status:", err.response?.data || err);
+    } finally {
       setLoading(false);
     }
-  }, []);
+  };
+
+  fetchVolunteerStatus();
+}, []); // 🚀 empty array so effect runs only once after mount
+
+
 
   const getStatusColor = (status) => {
     if (status === "Approved") return "success";

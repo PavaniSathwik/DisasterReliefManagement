@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import "leaflet/dist/leaflet.css";
 
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { Box } from "@mui/material";
+
 import ResponsiveAppBar from "./components/Navbar/Navbar";
 import Footer from "./components/Footer/Footer";
 import Home from "./components/Home/Home";
@@ -18,6 +20,8 @@ import AdminUserManagement from "./components/admin/usermanagment";
 import AdminVolunteerApproval from "./components/admin/volunteerallotment";
 import AdminDonate from "./components/admin/Admindonate";
 import Adminfeedback from "./components/admin/feedback";
+import AnnouncementsByGovt from "./components/AnnouncementsByGovt/AnnouncementsByGovt.jsx";
+
 // User Components
 import UserHome from "./components/user/Home";
 import UserNavBar from "./components/user/NavBar";
@@ -35,22 +39,29 @@ const isAuthenticated = () => !!localStorage.getItem("token");
 // Check if logged-in user is an admin
 const isAdmin = () => localStorage.getItem("isAdmin") === "true";
 
-// Public Layout (for general users)
-const PublicLayout = ({ children }) => (
-  <>
-    <ResponsiveAppBar />
-    {children}
+// Layout wrapper for consistent footer at bottom
+const LayoutWrapper = ({ header, children }) => (
+  <Box
+    sx={{
+      display: "flex",
+      flexDirection: "column",
+      minHeight: "100vh",
+    }}
+  >
+    {header}
+    <Box sx={{ flexGrow: 1 }}>{children}</Box>
     <Footer />
-  </>
+  </Box>
 );
 
-// User Layout (for logged-in users)
+// Public Layout
+const PublicLayout = ({ children }) => (
+  <LayoutWrapper header={<ResponsiveAppBar />}>{children}</LayoutWrapper>
+);
+
+// User Layout
 const UserLayout = ({ children }) => (
-  <>
-    <UserNavBar />
-    {children}
-    <Footer />
-  </>
+  <LayoutWrapper header={<UserNavBar />}>{children}</LayoutWrapper>
 );
 
 // Admin Layout (only for admins)
@@ -63,14 +74,8 @@ const AdminLayout = ({ children }) => {
   }, [location.pathname]);
 
   if (!admin) return <Navigate to="/admin-login" replace />;
-  
-  return (
-    <>
-      <AdminNavbar />
-      {children}
-      <Footer />
-    </>
-  );
+
+  return <LayoutWrapper header={<AdminNavbar />}>{children}</LayoutWrapper>;
 };
 
 function App() {
@@ -83,6 +88,10 @@ function App() {
         <Route path="/register" element={<PublicLayout><Register /></PublicLayout>} />
         <Route path="/emergency-contacts" element={<PublicLayout><EmergencyContacts /></PublicLayout>} />
         <Route path="/admin-login" element={<PublicLayout><AdminLogin /></PublicLayout>} />
+        <Route path="/announcements" element={ <PublicLayout><AnnouncementsByGovt /></PublicLayout>} 
+/>
+
+
         {/* User Routes (Only for Authenticated Users) */}
         {isAuthenticated() ? (
           <>
@@ -90,9 +99,8 @@ function App() {
             <Route path="/user/request-help" element={<UserLayout><UserRequestHelp /></UserLayout>} />
             <Route path="/user/donate" element={<UserLayout><UserDonate /></UserLayout>} />
             <Route path="/user/announcements" element={<UserLayout><UserAnnouncements /></UserLayout>} />
-            <Route path="/user/emergency-contacts" element={<UserLayout><UserEmergencycontacts/></UserLayout>}/>
-            <Route path="/user/volunteer" element={<UserLayout><UserVolunteer/></UserLayout>}/>
-
+            <Route path="/user/emergency-contacts" element={<UserLayout><UserEmergencycontacts /></UserLayout>} />
+            <Route path="/user/volunteer" element={<UserLayout><UserVolunteer /></UserLayout>} />
           </>
         ) : (
           <Route path="/user/*" element={<Navigate to="/login" replace />} />
@@ -109,8 +117,6 @@ function App() {
             <Route path="/admin/volunteerallotment" element={<AdminLayout><AdminVolunteerApproval /></AdminLayout>} />
             <Route path="/admin/admin-donate" element={<AdminLayout><AdminDonate /></AdminLayout>} />
             <Route path="/admin/feedback" element={<AdminLayout><Adminfeedback /></AdminLayout>} />
-
-
           </>
         ) : (
           <Route path="/admin/*" element={<Navigate to="/admin-login" replace />} />

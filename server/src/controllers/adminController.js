@@ -5,6 +5,8 @@ const User = require('../models/User');
 const EmergencyRequest = require('../models/EmergencyRequest'); // Adjust the path to where your model is located
 const Alert = require("../models/Alert");
 const EmergencyStatus = require("../models/EmergencyStatus");
+const Donation = require("../models/Donation");
+
 // Get all departments
 exports.getAllDepartments = async (req, res) => {
     try {
@@ -270,9 +272,10 @@ exports.getAllEmergencyStatuses = async (req, res) => {
 
 exports.submitAlert = async (req, res) => {
   try {
-    const { title, situation, helpType, distance, severity } = req.body;
+    const { title, situation, helpType, distance, severity, location } = req.body;
 
-    if (!title || !situation || !helpType || !distance || !severity) {
+    // Basic validation
+    if (!title || !situation || !helpType || !distance || !severity || !location) {
       return res.status(400).json({ message: "All fields are required." });
     }
 
@@ -281,14 +284,28 @@ exports.submitAlert = async (req, res) => {
       situation,
       helpType,
       distance,
-      severity
+      severity,
+      location // <-- Add location here
     });
 
     await newAlert.save();
 
-    res.status(201).json({ message: "Alert submitted successfully." });
+    res.status(201).json({ message: "Alert submitted successfully.", data: newAlert });
   } catch (error) {
     console.error("Error submitting alert:", error);
     res.status(500).json({ message: "Server error" });
   }
 };
+////////////////////
+// GET all donations
+// GET /api/admin/donations
+exports.getAllDonations = async (req, res) => {
+  try {
+    const donations = await Donation.find().sort({ createdAt: -1 });
+    res.status(200).json({ donations });
+  } catch (err) {
+    console.error("Error fetching donations:", err);
+    res.status(500).json({ error: "Server error while fetching donations" });
+  }
+};
+

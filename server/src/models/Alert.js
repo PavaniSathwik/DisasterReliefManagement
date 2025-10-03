@@ -6,6 +6,7 @@ const alertSchema = new mongoose.Schema({
   helpType: { type: String, enum: ["volunteer", "donate", "both"], required: true },
   distance: { type: Number, required: true },
   severity: { type: String, enum: ["green", "yellow", "red"], required: true },
+  location: { type: String, required: true }, // <-- Added location field
   createdAt: { type: Date, default: Date.now }
 });
 

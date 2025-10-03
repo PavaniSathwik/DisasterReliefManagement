@@ -35,4 +35,15 @@ router.get("/emergency-statuses", adminController.getAllEmergencyStatuses);
 
 router.post("/update-emergency-status", adminController.updateEmergencyStatus);
 router.delete("/delete-emergency/:id", adminController.deleteEmergencyRequest);
+
+
+
+
+// backend/routes/adminRoutes.js
+router.get("/donations", adminController.getAllDonations);
+
+
+
+
+
 module.exports = router;

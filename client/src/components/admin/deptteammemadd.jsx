@@ -1,5 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { Container, Typography, TextField, Button, Select, MenuItem, FormControl, InputLabel, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Box } from "@mui/material";
+import {
+  Container, Typography, TextField, Button,
+  Select, MenuItem, FormControl, InputLabel,
+  Table, TableBody, TableCell, TableContainer,
+  TableHead, TableRow, Paper, Box
+} from "@mui/material";
 import axios from "axios";
 
 const AdminTeamMember = () => {
@@ -18,7 +23,7 @@ const AdminTeamMember = () => {
       const response = await axios.get("http://localhost:3002/api/admin/departments");
       setDepartments(response.data);
     } catch (error) {
-      console.error("❌ Error fetching departments:", error);
+      alert("Failed to load departments.");
     }
   };
 
@@ -27,24 +32,26 @@ const AdminTeamMember = () => {
       const response = await axios.get("http://localhost:3002/api/admin/employees");
       setEmployees(response.data);
     } catch (error) {
-      console.error("❌ Error fetching employees:", error);
+      alert("Failed to load employees.");
     }
   };
 
   const addEmployee = async (e) => {
     e.preventDefault();
-    if (!name || !department) return alert("Please enter all fields");
-
+    if (!name.trim() || !department) {
+      alert("Please enter all fields.");
+      return;
+    }
     try {
       await axios.post("http://localhost:3002/api/admin/employees", {
         name,
-        departmentId: department, // Send department ID instead of name
+        departmentId: department,
       });
       fetchEmployees();
       setName("");
       setDepartment("");
     } catch (error) {
-      console.error("❌ Error adding employee:", error);
+      alert(error.response?.data?.error || "Failed to add employee.");
     }
   };
 
@@ -54,28 +61,48 @@ const AdminTeamMember = () => {
       await axios.delete(`http://localhost:3002/api/admin/employees/${id}`);
       fetchEmployees();
     } catch (error) {
-      console.error("❌ Error deleting employee:", error);
+      alert(error.response?.data?.error || "Failed to delete employee.");
     }
   };
 
   return (
-    <Container maxWidth="md" sx={{ mt: 5, textAlign: "center" }}>
-      <Typography variant="h4" gutterBottom sx={{ fontWeight: "bold", color: "#333" }}>
-        Admin Employee Management
+    <Container maxWidth="md" sx={{
+      mt: 7,
+      mb: 5,
+      background: "#f5f6fa",
+      borderRadius: 2,
+      boxShadow: "0 2px 12px rgba(17,72,107,0.05)",
+      minHeight: "70vh",
+      p: 3,
+      textAlign: "left"
+    }}>
+      <Typography variant="h4" gutterBottom sx={{
+        fontWeight: "bold",
+        color: "#11486b",
+        mt: 2,
+        mb: 1,
+        letterSpacing: "1px",
+        fontFamily: "inherit"
+      }}>
+        Employee Management
       </Typography>
 
-      <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", mt: 3 }}>
-        <form onSubmit={addEmployee} className="mb-4" style={{ width: "100%" }}>
+      <Box sx={{ display: "flex", flexDirection: "column", alignItems: "flex-start", mt: 3 }}>
+        <form onSubmit={addEmployee} style={{ width: "100%" }}>
           <Box sx={{ display: "flex", gap: 2, mb: 3 }}>
             <TextField
               label="Employee Name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              fullWidth
-              sx={{ width: "50%" }}
+              sx={{
+                width: "300px",
+                background: "#fff",
+                borderRadius: 1
+              }}
+              size="small"
               required
             />
-            <FormControl fullWidth sx={{ width: "50%" }} required>
+            <FormControl sx={{ width: "300px", background: "#fff", borderRadius: 1 }} required>
               <InputLabel>Department</InputLabel>
               <Select
                 value={department}
@@ -92,59 +119,70 @@ const AdminTeamMember = () => {
                 ))}
               </Select>
             </FormControl>
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              sx={{
+                fontWeight: "bold",
+                borderRadius: 1,
+                boxShadow: "none",
+                textTransform: "none",
+                background: "#11486b",
+                ":hover": { background: "#0d3550" },
+                minWidth: "120px"
+              }}
+            >
+              Add
+            </Button>
           </Box>
-          <Button
-            type="submit"
-            variant="contained"
-            color="primary"
-            sx={{
-              width: "30%",
-              backgroundColor: "#1976D2",
-              ":hover": { backgroundColor: "#155A9A" },
-              fontSize: "16px",
-              fontWeight: "bold",
-              borderRadius: "8px",
-            }}
-          >
-            Add Employee
-          </Button>
         </form>
 
-        <TableContainer component={Paper} sx={{ boxShadow: 3 }}>
+        <TableContainer component={Paper} sx={{
+          borderRadius: 1,
+          boxShadow: "none",
+          background: "#ffffff",
+          mt: 3,
+          width: "100%"
+        }}>
           <Table>
             <TableHead>
-              <TableRow sx={{ backgroundColor: "#1976D2" }}>
-                <TableCell sx={{ color: "white", fontWeight: "bold", textAlign: "center" }}>#</TableCell>
-                <TableCell sx={{ color: "white", fontWeight: "bold", textAlign: "center" }}>Name</TableCell>
-                <TableCell sx={{ color: "white", fontWeight: "bold", textAlign: "center" }}>Department</TableCell>
-                <TableCell sx={{ color: "white", fontWeight: "bold", textAlign: "center" }}>Actions</TableCell>
+              <TableRow sx={{ backgroundColor: "#11486b" }}>
+                <TableCell sx={{ color: "#fff", fontWeight: "bold", textAlign: "center" }}>#</TableCell>
+                <TableCell sx={{ color: "#fff", fontWeight: "bold", textAlign: "center" }}>Name</TableCell>
+                <TableCell sx={{ color: "#fff", fontWeight: "bold", textAlign: "center" }}>Department</TableCell>
+                <TableCell sx={{ color: "#fff", fontWeight: "bold", textAlign: "center" }}>Actions</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {employees.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={4} sx={{ textAlign: "center", color: "gray" }}>
+                  <TableCell colSpan={4} sx={{
+                    textAlign: "center", color: "#11486b", py: 2
+                  }}>
                     No employees added yet.
                   </TableCell>
                 </TableRow>
               ) : (
                 employees.map((employee, index) => (
-                  <TableRow key={employee._id} sx={{ "&:nth-of-type(even)": { backgroundColor: "#f5f5f5" } }}>
+                  <TableRow key={employee._id} sx={{ "&:nth-of-type(even)": { backgroundColor: "#eaeaea" } }}>
                     <TableCell sx={{ textAlign: "center" }}>{index + 1}</TableCell>
-                    <TableCell sx={{ textAlign: "center", fontWeight: "bold" }}>{employee.name}</TableCell>
+                    <TableCell sx={{ textAlign: "center" }}>{employee.name}</TableCell>
                     <TableCell sx={{ textAlign: "center" }}>
                       {employee.department?.name || "N/A"}
                     </TableCell>
                     <TableCell sx={{ textAlign: "center" }}>
                       <Button
                         variant="contained"
-                        color="error"
+                        color="secondary"
                         onClick={() => deleteEmployee(employee._id)}
                         sx={{
-                          fontSize: "14px",
                           fontWeight: "bold",
-                          borderRadius: "6px",
-                          ":hover": { backgroundColor: "#B71C1C" },
+                          borderRadius: 1,
+                          boxShadow: "none",
+                          textTransform: "none",
+                          background: "#ac2b49",
+                          ":hover": { background: "#881f33" }
                         }}
                       >
                         Delete

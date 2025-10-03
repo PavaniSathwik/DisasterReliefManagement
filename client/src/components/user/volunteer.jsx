@@ -2,6 +2,22 @@ import React, { useState } from "react";
 import { FaCloudUploadAlt } from "react-icons/fa";
 import axios from "axios";
 
+const colors = {
+  red: "#e84335", // Urgent red
+  orange: "#e67e22", // Warm orange
+  background: "#f8f9fa",
+  textDark: "#2c3e50",
+  borderRadius: "12px",
+  shadow: "0 8px 20px rgba(0, 0, 0, 0.15)",
+};
+
+const cardShadowStyle = {
+  boxShadow: colors.shadow,
+  borderRadius: colors.borderRadius,
+  backgroundColor: "#ffffff",
+  padding: "24px",
+};
+
 const VolunteerForm = () => {
   const [formData, setFormData] = useState({
     fullName: "",
@@ -39,23 +55,28 @@ const VolunteerForm = () => {
     const data = new FormData();
     Object.entries(formData).forEach(([key, val]) => {
       if (key === "skills") {
-        // send skills as array of strings
-        val.split(",").map((s) => s.trim()).filter(Boolean).forEach(skill => data.append("skills[]", skill));
+        val
+          .split("||")
+          .map((s) => s.trim())
+          .filter(Boolean)
+          .forEach((skill) => data.append("skills[]", skill));
       } else {
         data.append(key, val);
       }
     });
     if (photo) {
-      data.append("profilePicture", photo); // ✅ matches backend
-
+      data.append("profilePicture", photo);
     }
 
     try {
-      const res = await axios.post("http://localhost:3002/api/users/volunteer", data, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      const res = await axios.post(
+        "http://localhost:3002/api/users/volunteer",
+        data,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
       alert(res.data.message);
-      // Clear form
       setFormData({
         fullName: "",
         age: "",
@@ -75,130 +96,259 @@ const VolunteerForm = () => {
       });
       setPhoto(null);
     } catch (err) {
-      alert("Error submitting volunteer request: " + (err.response?.data?.message || err.message));
+      alert(
+        "Error submitting volunteer request: " +
+          (err.response?.data?.message || err.message)
+      );
     }
   };
 
-  return (
-  <div style={{ maxWidth: 600, margin: "40px auto", padding: 20, background: "#f8f9fa", boxShadow: "0 4px 8px rgba(0,0,0,0.1)", borderRadius: 10 }}>
-    <h2 style={{ textAlign: "center", color: "#007bff", marginBottom: 20 }}>Volunteer Request Form</h2>
-
-    <form onSubmit={handleSubmit} encType="multipart/form-data">
-      <label style={uploadLabelStyle}>
-        <FaCloudUploadAlt size={40} style={{ color: "#007bff" }} />
-        <p style={{ marginTop: 10 }}>Upload Profile Picture</p>
-        <input type="file" accept="image/*" onChange={handlePhotoChange} style={{ display: "none" }} />
+  // Helper for two-column layout inputs inside the form
+  const renderInput = (
+    label,
+    name,
+    type = "text",
+    required = false,
+    options
+  ) => (
+    <div
+      className="mb-3"
+      style={{
+        flex: "1 1 48%",
+        minWidth: 200,
+      }}
+      key={name}
+    >
+      <label htmlFor={name} className="form-label fw-semibold">
+        {label}
       </label>
-
-      {photo && (
-        <div style={{ textAlign: "center", marginTop: 15 }}>
-          <img
-            src={URL.createObjectURL(photo)}
-            alt="Profile Preview"
-            style={{ width: 120, height: 120, borderRadius: "50%", objectFit: "cover", border: "3px solid #007bff" }}
-          />
-        </div>
+      {type === "select" ? (
+        <select
+          id={name}
+          name={name}
+          value={formData[name]}
+          onChange={handleChange}
+          className="form-select form-select-sm"
+          required={required}
+          style={{ borderColor: colors.orange }}
+        >
+          {options.map((opt) => (
+            <option key={opt} value={opt}>
+              {opt === "" ? "-- Select --" : opt}
+            </option>
+          ))}
+        </select>
+      ) : type === "textarea" ? (
+        <textarea
+          id={name}
+          name={name}
+          value={formData[name]}
+          onChange={handleChange}
+          rows={3}
+          className="form-control form-control-sm"
+          style={{ resize: "vertical", borderColor: colors.orange }}
+        />
+      ) : (
+        <input
+          type={type}
+          id={name}
+          name={name}
+          value={formData[name]}
+          onChange={handleChange}
+          className="form-control form-control-sm"
+          required={required}
+          style={{ borderColor: colors.orange }}
+        />
       )}
+    </div>
+  );
 
-      <input type="text" name="fullName" placeholder="Full Name*" value={formData.fullName} onChange={handleChange} required style={inputStyle} />
-      <input type="number" name="age" placeholder="Age" value={formData.age} onChange={handleChange} style={inputStyle} />
+  return (
+    <div
+      className="container mt-5"
+      style={{
+        maxWidth: 1100,
+        fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+      }}
+    >
+      <div
+        className="d-flex gap-4"
+        style={{
+          alignItems: "flex-start",
+          justifyContent: "start",
+          minHeight: 800,
+        }}
+      >
+        {/* Left: Precautions & Info Card */}
+        <div
+          style={{
+            minWidth: 360,
+            maxWidth: 360,
+            textAlign: "left",
+            overflowY: "auto",
+            height: "100%",
+            boxSizing: "border-box",
+            borderRadius: colors.borderRadius,
+            backgroundColor: "#fff4e6",
+            border: `3px solid ${colors.orange}`,
+            padding: "24px",
+            boxShadow: colors.shadow,
+            color: colors.textDark,
+            flexShrink: 0,
+          }}
+        >
+          <h4
+            className="fw-bold mb-3"
+            style={{ color: colors.red, fontWeight: "900" }}
+          >
+            🚨 Volunteer with Urgency and Care
+          </h4>
+          <p>🙋‍♀️ <strong>Your role as a volunteer is essential</strong> to saving lives and restoring hope.</p>
+          <p>🔍 <strong>Assess situations carefully</strong> and prioritize safety for yourself and others.</p>
+          <p>📸 <strong>Document clearly:</strong> photos/videos help responders only if it's safe.</p>
+          <p>📍 <strong>Confirm location:</strong> accurate info helps us send help faster.</p>
+          <p>👥 <strong>Count affected people:</strong> precise numbers improve resource allocation.</p>
+          <p>⚠️ <strong>Assign severity properly:</strong> helps in prioritizing critical needs.</p>
+          <p>🏥 <strong>Declare your skills:</strong> so you can be deployed effectively.</p>
+          <p>🛑 <strong>Follow coordinators:</strong> ensure safety and smooth aid.</p>
+          <p>📱 <strong>Stay reachable:</strong> update contact info and respond promptly.</p>
+          <p>🤝 <strong>Together we build resilience:</strong> your volunteer efforts make strong communities.</p>
+          <p style={{ fontSize: "0.9rem", color: colors.red, fontWeight: "700", marginTop: 20 }}>
+            ⚠️ <em>Always volunteer safely and responsibly.</em>
+          </p>
+        </div>
 
-      <select name="gender" value={formData.gender} onChange={handleChange} style={inputStyle}>
-        <option value="">Select Gender</option>
-        <option value="Male">Male</option>
-        <option value="Female">Female</option>
-        <option value="Other">Other</option>
-      </select>
+        {/* Right: Volunteer Form */}
+        <div
+          className="flex-grow-1"
+          style={{
+            maxWidth: 700,
+            minWidth: 650,
+            ...cardShadowStyle,
+            padding: "24px",
+          }}
+        >
+          <h2 className="text-center mb-4" style={{ color: colors.orange }}>
+            Volunteer Request Form
+          </h2>
 
-      <input type="text" name="contact" placeholder="Contact Number" value={formData.contact} onChange={handleChange} style={inputStyle} />
-      <input type="email" name="email" placeholder="Email" value={formData.email} onChange={handleChange} style={inputStyle} />
-      <input type="text" name="locality" placeholder="Locality" value={formData.locality} onChange={handleChange} style={inputStyle} />
-      <input type="text" name="idType" placeholder="ID Type" value={formData.idType} onChange={handleChange} style={inputStyle} />
-      <input type="text" name="idNumber" placeholder="ID Number" value={formData.idNumber} onChange={handleChange} style={inputStyle} />
+          <form onSubmit={handleSubmit} encType="multipart/form-data">
+            {/* Photo Upload */}
+            <label
+              htmlFor="photoUpload"
+              className="d-block text-center border rounded-3 p-4 mb-4"
+              style={{
+                cursor: "pointer",
+                borderColor: colors.orange,
+                color: colors.orange,
+                fontWeight: "700",
+              }}
+            >
+              <FaCloudUploadAlt size={40} />
+              <p className="mt-2 mb-0">
+                {photo ? "Photo Selected" : "Upload Profile Picture"}
+              </p>
+              <input
+                id="photoUpload"
+                type="file"
+                accept="image/*"
+                onChange={handlePhotoChange}
+                style={{ display: "none" }}
+              />
+            </label>
 
-<select
-  name="skills"
-  value={formData.skills}
-  onChange={handleChange}
-  style={inputStyle}
->
-  <option value="">Select Skills</option>
-  <option value="Medical Aid || Logistics || Search & Rescue">Medical Aid || Logistics || Search & Rescue</option>
-  <option value="Cooking || Transport || Communication">Cooking || Transport || Communication</option>
-  <option value="First Aid || Crowd Management || Emergency Response">First Aid || Crowd Management || Emergency Response</option>
-</select>
+            {photo && (
+              <div className="text-center mb-4">
+                <img
+                  src={URL.createObjectURL(photo)}
+                  alt="Profile Preview"
+                  className="rounded-circle"
+                  style={{
+                    width: 120,
+                    height: 120,
+                    objectFit: "cover",
+                    border: `3px solid ${colors.orange}`,
+                  }}
+                />
+              </div>
+            )}
 
+            {/* Form inputs: 2-column layout */}
+            <div className="d-flex flex-wrap justify-content-between gap-3">
+              {renderInput("Full Name*", "fullName", "text", true)}
+              {renderInput("Age", "age", "number")}
+              {renderInput("Gender", "gender", "select", false, [
+                "",
+                "Male",
+                "Female",
+                "Other",
+              ])}
+              {renderInput("Contact Number", "contact", "text")}
+              {renderInput("Email", "email", "email")}
+              {renderInput("Locality", "locality", "text")}
+              {renderInput("ID Type", "idType", "text")}
+              {renderInput("ID Number", "idNumber", "text")}
+              {renderInput(
+                "Skills (use '||' to separate)",
+                "skills"
+              )}
+              {renderInput(
+                "Role",
+                "role",
+                "select",
+                false,
+                [
+                  "",
+                  "First Responder",
+                  "Supply Coordinator",
+                  "Shelter Manager",
+                  "Transport Support",
+                ]
+              )}
+              {renderInput(
+                "Availability",
+                "availability",
+                "select",
+                false,
+                ["", "Today Evening", "Tomorrow Morning", "This Weekend", "Anytime"]
+              )}
+              {renderInput("Motivation", "motivation", "textarea")}
+              {renderInput(
+                "Observed Location",
+                "observedLocation",
+                "select",
+                false,
+                ["", "Tadepalli", "Guntur", "Vijayawada", "Kunchanapalli"]
+              )}
+              {renderInput("Observation", "observation", "textarea")}
+              {renderInput(
+                "Contribution",
+                "contribution",
+                "select",
+                false,
+                ["", "Food Donation", "Clothes", "Transport Support", "Time/Volunteering"]
+              )}
+            </div>
 
-
-      <select name="role" value={formData.role} onChange={handleChange} style={inputStyle}>
-        <option value="">Select Role</option>
-        <option value="First Responder">First Responder</option>
-        <option value="Supply Coordinator">Supply Coordinator</option>
-        <option value="Shelter Manager">Shelter Manager</option>
-        <option value="Transport Support">Transport Support</option>
-      </select>
-
-      <select name="availability" value={formData.availability} onChange={handleChange} style={inputStyle}>
-        <option value="">Select Availability</option>
-        <option value="Today Evening">Today Evening</option>
-        <option value="Tomorrow Morning">Tomorrow Morning</option>
-        <option value="This Weekend">This Weekend</option>
-        <option value="Anytime">Anytime</option>
-      </select>
-
-      <textarea name="motivation" placeholder="Motivation" value={formData.motivation} onChange={handleChange} style={textareaStyle} />
-
-      <select name="observedLocation" value={formData.observedLocation} onChange={handleChange} style={inputStyle}>
-        <option value="">Select Observed Location</option>
-        <option value="Tadepalli">Tadepalli</option>
-        <option value="Guntur">Guntur</option>
-        <option value="Vijayawada">Vijayawada</option>
-        <option value="Kunchanapalli">Kunchanapalli</option>
-      </select>
-
-      <textarea name="observation" placeholder="Observation" value={formData.observation} onChange={handleChange} style={textareaStyle} />
-
-      <select name="contribution" value={formData.contribution} onChange={handleChange} style={inputStyle}>
-        <option value="">Select Contribution</option>
-        <option value="Food Donation">Food Donation</option>
-        <option value="Clothes">Clothes</option>
-        <option value="Transport Support">Transport Support</option>
-        <option value="Time/Volunteering">Time/Volunteering</option>
-      </select>
-
-      <button type="submit" style={buttonStyle}>Submit Request</button>
-    </form>
-  </div>
-);
-
-};
-
-const inputStyle = {
-  width: "100%",
-  padding: 10,
-  marginTop: 10,
-  borderRadius: 5,
-  border: "1px solid #ced4da",
-  boxSizing: "border-box",
-};
-const textareaStyle = { ...inputStyle, height: 80, resize: "none" };
-const buttonStyle = {
-  width: "100%",
-  padding: 10,
-  marginTop: 20,
-  background: "#007bff",
-  color: "white",
-  border: "none",
-  borderRadius: 5,
-  cursor: "pointer",
-};
-const uploadLabelStyle = {
-  display: "block",
-  textAlign: "center",
-  border: "2px dashed #007bff",
-  padding: 20,
-  cursor: "pointer",
-  borderRadius: 10,
+            <button
+              type="submit"
+              className="btn fw-bold w-100 py-3 mt-4"
+              style={{
+                backgroundColor: colors.red,
+                borderColor: colors.red,
+                fontSize: "1.25rem",
+                transition: "background-color 0.3s ease",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = colors.orange)}
+              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = colors.red)}
+            >
+              🚀 Submit Volunteer Request
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default VolunteerForm;

@@ -5,8 +5,8 @@ const Volunteer = require("../models/volunteerModel");
 const SECRET_KEY = 'yourSecretKey';
 const multer = require("multer");
 const bcrypt = require("bcrypt"); // ✅
-const userController = require("../controllers/userController");
-
+const Alert = require("../models/Alert");
+const Donation = require("../models/Donation");
  // adjust path if needed
 
 const { loginUser } = require('../controllers/authController');
@@ -266,51 +266,98 @@ exports.updateVolunteerStatus = async (req, res) => {
   }
 };
 
-// exports.getVolunteerById = async (req, res) => {
-//   try {
-//     const volunteer = await Volunteer.findById(req.params.id);
-//     if (!volunteer) return res.status(404).json({ message: "Volunteer not found" });
-//     res.json(volunteer);
-//   } catch (err) {
-//     res.status(500).json({ message: "Server error" });
-//   }
-// };
+exports.getVolunteerById = async (req, res) => {
+  try {
+    const volunteer = await Volunteer.findById(req.params.id);
+    if (!volunteer) return res.status(404).json({ message: "Volunteer not found" });
+    res.json(volunteer);
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
 
 
 
-// exports.getVolunteerStatusByEmail = async (req, res) => {
-//   const { email } = req.query;
-
-//   try {
-//     const volunteer = await Volunteer.findOne({ email });
-
-//     if (!volunteer) {
-//       return res.status(404).json({ message: "No volunteer record found for this email." });
-//     }
-
-//     res.json({
-//       fullName: volunteer.fullName,
-//       status: volunteer.status,
-//       adminComment: volunteer.adminComment || "",
-//     });
-//   } catch (err) {
-//     console.error("Error in getVolunteerStatusByEmail:", err);
-//     res.status(500).json({ message: "Server error while fetching volunteer status" });
-//   }
-// };
-
-exports.getVolunteerByEmail = async (req, res) => {
+exports.getVolunteerStatusByEmail = async (req, res) => {
   const { email } = req.query;
 
   try {
     const volunteer = await Volunteer.findOne({ email });
+
     if (!volunteer) {
+      return res.status(404).json({ message: "No volunteer record found for this email." });
+    }
+
+    res.json({
+      fullName: volunteer.fullName,
+      status: volunteer.status,
+      adminComment: volunteer.adminComment || "",
+    });
+  } catch (err) {
+    console.error("Error in getVolunteerStatusByEmail:", err);
+    res.status(500).json({ message: "Server error while fetching volunteer status" });
+  }
+};
+
+/////////////////////////////////////////////
+exports.getVolunteerByEmail = async (req, res) => {
+  // 1️⃣ Read email safely, trim spaces and lowercase
+  const email = (req.query.email || "").trim().toLowerCase();
+
+  if (!email) {
+    return res.status(400).json({ message: "Email query parameter is required" });
+  }
+
+  try {
+    // 2️⃣ Case-insensitive search in MongoDB
+    const volunteer = await Volunteer.findOne({
+      email: { $regex: `^${email}$`, $options: "i" }
+    });
+
+    if (!volunteer) {
+      console.log("No volunteer found for email:", email); // Debug log
       return res.status(404).json({ message: "Volunteer not found" });
     }
+
     res.json(volunteer);
   } catch (error) {
     console.error("Error fetching volunteer by email:", error);
     res.status(500).json({ message: "Server error" });
   }
 };
+
+
+
+////////////////////////////////////////
+exports.getUserAlerts = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ success: false, error: "User not found" });
+    }
+
+    console.log("👉 User.address:", JSON.stringify(user.address));
+
+    // Fetch all alerts first (to confirm what's inside)
+    const allAlerts = await Alert.find();
+    console.log("👉 All alerts in DB:", allAlerts);
+
+    // Case-insensitive match
+    const alerts = await Alert.find({
+      location: { $regex: new RegExp(user.address, "i") }
+    });
+
+    console.log("👉 Alerts found:", alerts);
+
+    res.json({ success: true, alerts });
+  } catch (err) {
+    console.error("❌ Error fetching alerts:", err);
+    res.status(500).json({ success: false, error: "Server error" });
+  }
+};
+
+
+//////////////////////////////////////////////
 

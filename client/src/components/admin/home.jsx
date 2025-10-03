@@ -18,6 +18,7 @@ export default function AdminHome() {
   const [statuses, setStatuses] = useState([]);
   const [pendingCount, setPendingCount] = useState(0);
   const [newsArticles, setNewsArticles] = useState([]);
+  const [locality, setLocality] = useState("");
 
   const [title, setTitle] = useState("");
   const [situation, setSituation] = useState("");
@@ -52,26 +53,29 @@ export default function AdminHome() {
       .catch(err => console.error("Error fetching news:", err));
   }, []);
 
-  const handleSubmit = async () => {
-    try {
-      await axios.post("http://localhost:3002/api/admin/submit-alert", {
-        title,
-        situation,
-        helpType,
-        distance,
-        severity
-      });
-      alert("✅ Alert submitted!");
-      setTitle("");
-      setSituation("");
-      setHelpType("");
-      setDistance("");
-      setSeverity("green");
-    } catch (err) {
-      console.error("❌ Error submitting alert:", err);
-      alert("❌ Failed to submit alert");
-    }
-  };
+ const handleSubmit = async () => {
+  try {
+    await axios.post("http://localhost:3002/api/admin/submit-alert", {
+      title,
+      situation,
+      helpType,
+      distance,
+      severity,
+      location: locality // send the current locality
+    });
+    alert("✅ Alert submitted!");
+    setTitle("");
+    setSituation("");
+    setHelpType("");
+    setDistance("");
+    setSeverity("green");
+    setLocality(""); // optional, reset after submit
+  } catch (err) {
+    console.error("❌ Error submitting alert:", err);
+    alert("❌ Failed to submit alert");
+  }
+};
+
 
   return (
     <Container maxWidth="xl" sx={{ mt: 5 }}>
@@ -141,6 +145,12 @@ export default function AdminHome() {
             <Grid container spacing={2}>
               <Grid item xs={12}>
                 <TextField label="Alert Title" fullWidth value={title} onChange={(e) => setTitle(e.target.value)} />
+                             <TextField
+    label="Locality"
+    fullWidth
+    value={locality}
+    onChange={(e) => setLocality(e.target.value)}
+  />
               </Grid>
 
               <Grid item xs={12}>
@@ -161,7 +171,7 @@ export default function AdminHome() {
               <Grid item xs={12} sm={6}>
                 <TextField label="Distance from You (km)" type="number" fullWidth value={distance} onChange={(e) => setDistance(e.target.value)} />
               </Grid>
-
+           
               <Grid item xs={12}>
                 <FormControl component="fieldset">
                   <FormLabel component="legend">Danger Severity</FormLabel>

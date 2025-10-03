@@ -18,7 +18,7 @@ const handleLogin = async () => {
 
     // Save volunteer email for later fetching volunteer data
     localStorage.setItem("volunteerEmail", response.data.email); // 👈 store email
-
+    localStorage.setItem("userId", response.data.userId || response.data._id);
 
     navigate("/user/home");  // ✅ Redirect to User Home
   } catch (err) {
@@ -50,3 +50,6 @@ const handleLogin = async () => {
     </Container>
   );
 }
+
+
+
