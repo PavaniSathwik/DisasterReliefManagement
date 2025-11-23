@@ -33,7 +33,7 @@ pipeline {
 
         stage('Kill Previous Server on Port 3002') {
             steps {
-                echo "Stopping backend on port 3002..."
+                echo "Killing previous server..."
                 bat '''
                 FOR /F "tokens=5" %%a IN ('netstat -aon ^| find ":3002"') DO (
                     echo Killing PID %%a
@@ -45,7 +45,7 @@ pipeline {
 
         stage('Start Backend Server') {
             steps {
-                echo "Starting server..."
+                echo "Starting Node server..."
                 bat 'cd server && node server.js'
             }
         }
