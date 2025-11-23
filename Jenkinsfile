@@ -8,26 +8,31 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main',
-                    url: 'https://github.com/PavaniSathwik/DisasterReliefManagement.git'
+                git url: 'https://github.com/psathwik2200031830/DisasterReliefManagement.git', branch: 'main'
             }
         }
 
-        stage('Install Dependencies') {
+        stage('Install Client Dependencies') {
             steps {
-                sh 'npm install'
+                bat 'cd client && npm install'
             }
         }
 
-        stage('Build') {
+        stage('Install Server Dependencies') {
             steps {
-                sh 'npm run build'
+                bat 'cd server && npm install'
             }
         }
 
-        stage('Test') {
+        stage('Build Client') {
             steps {
-                echo 'No tests configured'
+                bat 'cd client && npm run build'
+            }
+        }
+
+        stage('Run Server') {
+            steps {
+                bat 'cd server && node server.js'
             }
         }
     }
