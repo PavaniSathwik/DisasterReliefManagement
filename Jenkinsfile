@@ -2,12 +2,11 @@ pipeline {
     agent any
 
     environment {
-        NODEJS_HOME = 'C:\\Program Files\\nodejs' // Change if your node path is different
-        PATH = "${env.NODEJS_HOME};${env.PATH}"
+        NODE_HOME = tool name: 'NodeJS', type: 'NodeJS'
+        PATH = "${env.NODE_HOME}\\bin;${env.PATH}"
     }
 
     stages {
-
         stage('Checkout Code') {
             steps {
                 echo 'Pulling latest code from GitHub...'
@@ -40,7 +39,11 @@ pipeline {
             steps {
                 echo 'Stopping backend on port 3002...'
                 bat '''
-                FOR /F "tokens=5" %%a IN ('netstat -aon ^| find ":3002"') DO taskkill /PID %%a /F || echo PID %%a not found
+                FOR /F "tokens=5" %%a IN ('netstat -aon ^| find ":3002"') DO (
+                    echo Killing PID %%a
+                    taskkill /PID %%a /F || echo PID %%a not found
+                )
+                exit 0
                 '''
             }
         }
@@ -51,7 +54,6 @@ pipeline {
                 bat 'cd server && node src/config/server.js'
             }
         }
-
     }
 
     post {
@@ -59,7 +61,7 @@ pipeline {
             echo 'Build failed!'
         }
         success {
-            echo 'Build and server started successfully!'
+            echo 'Build succeeded!'
         }
     }
 }
