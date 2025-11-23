@@ -18,6 +18,8 @@ pipeline {
             steps {
                 echo 'Installing server dependencies...'
                 bat 'cd server && npm install'
+                // Install PM2 globally
+                bat 'npm install -g pm2'
             }
         }
 
@@ -50,8 +52,8 @@ pipeline {
 
         stage('Start Backend Server') {
             steps {
-                echo 'Starting backend server...'
-                bat 'cd server && node src/config/server.js'
+                echo 'Starting backend server with PM2...'
+                bat 'cd server && pm2 start src/config/server.js --name backend --watch'
             }
         }
     }
