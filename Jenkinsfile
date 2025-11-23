@@ -1,39 +1,52 @@
 pipeline {
     agent any
 
-    tools {
-        nodejs "node16"
-    }
-
     stages {
-        stage('Checkout') {
+
+        stage('Checkout Code') {
             steps {
-                git url: 'https://github.com/psathwik2200031830/DisasterReliefManagement.git', branch: 'main'
+                echo "Pulling latest code from GitHub..."
+                checkout scm
             }
         }
 
-        stage('Install Client Dependencies') {
+        stage('Install Backend Dependencies') {
             steps {
-                bat 'cd client && npm install'
-            }
-        }
-
-        stage('Install Server Dependencies') {
-            steps {
+                echo "Installing server dependencies..."
                 bat 'cd server && npm install'
             }
         }
 
-        stage('Build Client') {
+        stage('Install Frontend Dependencies') {
             steps {
+                echo "Installing client dependencies..."
+                bat 'cd client && npm install'
+            }
+        }
+
+        stage('Build Frontend') {
+            steps {
+                echo "Building React app..."
                 bat 'cd client && npm run build'
             }
         }
 
-        stage('Run Server') {
+        stage('Kill Previous Server on Port 3002') {
             steps {
-                // Run your server using the correct path
-                bat 'cd server\\src\\config && node server.js'
+                echo "Stopping backend on port 3002..."
+                bat '''
+                FOR /F "tokens=5" %%a IN ('netstat -aon ^| find ":3002"') DO (
+                    echo Killing PID %%a
+                    taskkill /PID %%a /F
+                )
+                '''
+            }
+        }
+
+        stage('Start Backend Server') {
+            steps {
+                echo "Starting server..."
+                bat 'cd server && node server.js'
             }
         }
     }
