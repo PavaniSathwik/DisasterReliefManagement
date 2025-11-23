@@ -32,7 +32,8 @@ pipeline {
 
         stage('Run Server') {
             steps {
-                bat 'cd server && node server.js'
+                // Run your server using the correct path
+                bat 'cd server\\src\\config && node server.js'
             }
         }
     }
