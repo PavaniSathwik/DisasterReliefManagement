@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     environment {
-        NODE_HOME = tool name: 'NodeJS', type: 'NodeJS'
-        PATH = "${env.NODE_HOME}\\bin;${env.PATH}"
+        // Use system-installed NodeJS (adjust path if needed)
+        PATH = "C:\\Program Files\\nodejs;${env.PATH}"
     }
 
     stages {
